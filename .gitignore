@@ -4,16 +4,16 @@ __pycache__
 
 
 # espeak stuff
-meili_tts_main/share/
-meili_tts_main/bin/
-meili_tts_main/lib
+main/share/
+main/bin/
+main/lib
 
 # processed (local files)
-meili_tts_main/processed
+main/processed
 
 # Build (pyinstaller)
-meili_tts_main/build
-meili_tts_main/dist
+main/build
+main/dist
 
 # Bundle
-meili_tts_bundle/
+MeiLiTTs.app
