@@ -1,3 +1,16 @@
+### Actual App now
+
+Run this from main/
+
+```bash
+pyinstaller --onefile \
+  --add-data "Resources:Resources" \
+  launch.py
+```
+
+Then copy the launch exec into .app/contents/MacOS
+And make sure Resources/ is at the same level
+
 ### How to run
 
 Run the ipynb file. It will produce things

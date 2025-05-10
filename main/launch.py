@@ -7,6 +7,8 @@ import time
 import webbrowser
 from pathlib import Path
 
+import rumps
+
 if hasattr(sys, "_MEIPASS"):
     RES_DIR = Path(sys._MEIPASS) / "Resources"
 else:
@@ -47,7 +49,21 @@ for _ in range(40):
 
 webbrowser.open("http://localhost:8000")
 
-try:
-    server_proc.wait()
-except KeyboardInterrupt:
-    server_proc.terminate()
+
+# Create a little rumps window to tell Mac this app is still running
+# and allow user to quit
+
+
+class MeiliApp(rumps.App):
+    def __init__(self):
+        super(MeiliApp, self).__init__("MeiliTTs", quit_button=None)
+        self.menu = ["Quit MeiliTTs"]
+
+    @rumps.clicked("Quit MeiliTTs")
+    def quit_app(self, _):
+        print("Shutting down MeiliTTs...")
+        server_proc.terminate()
+        rumps.quit_application()
+
+
+MeiliApp().run()
