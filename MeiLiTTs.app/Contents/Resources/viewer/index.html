@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MeiLiTTS</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 40px auto;
+        max-width: 700px;
+        padding: 0 20px;
+        line-height: 1.6;
+      }
+
+      h1 {
+        margin-top: 0;
+        font-size: 2em;
+      }
+
+      .upload-section,
+      .existing-section {
+        margin-bottom: 40px;
+      }
+
+      button {
+        padding: 6px 14px;
+        font-size: 1em;
+        margin-left: 10px;
+        cursor: pointer;
+      }
+
+      li {
+        margin-bottom: 8px;
+      }
+
+      .chunk {
+        margin: 8px 0;
+        padding: 6px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .chunk.active {
+        background-color: #d0ebff;
+      }
+
+      hr {
+        margin: 30px 0;
+      }
+
+      .loading {
+        color: #888;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📖 Meili's PDF Audio Reader</h1>
+
+    <div class="upload-section">
+      <h2>Upload a PDF</h2>
+      <div id="uploadInterface">
+        <input type="file" id="pdfInput" accept=".pdf" />
+        <button onclick="uploadPDF()">Process</button>
+      </div>
+      <p id="uploadStatus">
+        <small
+          >Your file will be processed locally using TTS and made
+          interactive.</small
+        >
+      </p>
+    </div>
+
+    <hr />
+
+    <div class="existing-section">
+      <h2>Your PDFs</h2>
+      <ul id="processedList">
+        <li class="loading">Loading...</li>
+      </ul>
+    </div>
+
+    <script>
+      async function uploadPDF() {
+        const fileInput = document.getElementById("pdfInput");
+        const status = document.getElementById("uploadStatus");
+        const uploadInterface = document.getElementById("uploadInterface");
+
+        const file = fileInput.files[0];
+
+        if (!file) return alert("Please select a PDF file first.");
+
+        const formData = new FormData();
+        formData.append("pdf", file);
+
+        uploadInterface.style.display = "none";
+        status.textContent = `Processing ${file.name || ""}... Please wait.`;
+        status.className = "loading";
+
+        const res = await fetch("/process", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          alert("Failed to process PDF.");
+          status.textContent = "❌ Error processing file.";
+          return;
+        }
+
+        const data = await res.json();
+        fileInput.value = ""; // Clear file input
+        status.textContent = "✅ Successfully processed!";
+        setTimeout(() => (status.textContent = ""), 2000);
+        window.location.href = `/reader.html/${data.name}`;
+      }
+
+      async function deletePDF(name) {
+        if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+
+        const res = await fetch(`/delete/${name}`, { method: "DELETE" });
+        if (res.ok) {
+          loadProcessed(); // Reload list
+        } else {
+          alert("Failed to delete file.");
+        }
+      }
+
+      async function loadProcessed() {
+        const res = await fetch("/list_processed");
+        const files = await res.json();
+        const list = document.getElementById("processedList");
+        list.innerHTML = "";
+
+        if (files.length === 0) {
+          list.innerHTML = "No PDFS found. Upload and process one";
+          return;
+        }
+
+        files.forEach((file) => {
+          const li = document.createElement("li");
+
+          const openBtn = document.createElement("button");
+          openBtn.textContent = "Open";
+          openBtn.onclick = () => {
+            window.location.href = `/reader.html/${file}`;
+          };
+
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Delete";
+          delBtn.style.backgroundColor = "#fdd";
+          delBtn.onclick = () => deletePDF(file);
+
+          li.textContent = file + " ";
+          li.appendChild(openBtn);
+          li.appendChild(delBtn);
+          list.appendChild(li);
+        });
+      }
+
+      loadProcessed();
+    </script>
+  </body>
+</html>

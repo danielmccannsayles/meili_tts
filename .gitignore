@@ -14,5 +14,4 @@ main/Resources/processed
 # Build (pyinstaller)
 main/build
 main/dist
-
-MeiLiTTs.app/
+MeiLiTTs.app/Contents/MacOS/launch
