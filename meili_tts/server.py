@@ -1,7 +1,8 @@
 import os
+import shutil
 from pathlib import Path
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, abort, jsonify, request, send_from_directory
 from process import process_pdf  # Reuse your logic
 from werkzeug.utils import secure_filename
 
@@ -18,13 +19,11 @@ def serve_index():
     return send_from_directory(VIEWER_DIR, "index.html")
 
 
-# Not sure what this does
 @app.route("/<path:filename>")
 def serve_static(filename):
     return send_from_directory(VIEWER_DIR, filename)
 
 
-# Dunno what this does
 @app.route("/processed/<pdf>/<filename>")
 def serve_output(pdf, filename):
     return send_from_directory(UPLOAD_DIR / pdf, filename)
@@ -34,6 +33,16 @@ def serve_output(pdf, filename):
 @app.route("/reader.html/<pdfname>")
 def serve_reader_html(pdfname):
     return send_from_directory(VIEWER_DIR, "reader.html")
+
+
+@app.route("/delete/<name>", methods=["DELETE"])
+def delete_processed(name):
+    folder = UPLOAD_DIR / secure_filename(name)
+    if folder.exists() and folder.is_dir():
+        shutil.rmtree(folder)
+        return "", 204
+    else:
+        return abort(404, "Not found")
 
 
 @app.route("/process", methods=["POST"])

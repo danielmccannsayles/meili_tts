@@ -6,3 +6,6 @@
 meili_tts/share/
 meili_tts/bin/
 meili_tts/lib
+
+# processed (local files)
+meili_tts/processed

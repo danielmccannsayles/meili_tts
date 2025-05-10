@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>MeiLi TTS</title>
+    <title>MeiLiTTS</title>
     <style>
       body {
         font-family: sans-serif;
@@ -47,16 +47,23 @@
       hr {
         margin: 30px 0;
       }
+
+      .loading {
+        color: #888;
+        font-style: italic;
+      }
     </style>
   </head>
   <body>
-    <h1>📖 Meilis PDF Audio Reader</h1>
+    <h1>📖 Meili's PDF Audio Reader</h1>
 
     <div class="upload-section">
       <h2>Upload a PDF</h2>
-      <input type="file" id="pdfInput" accept=".pdf" />
-      <button onclick="uploadPDF()">Process</button>
-      <p>
+      <div id="uploadInterface">
+        <input type="file" id="pdfInput" accept=".pdf" />
+        <button onclick="uploadPDF()">Process</button>
+      </div>
+      <p id="uploadStatus">
         <small
           >Your file will be processed locally using TTS and made
           interactive.</small
@@ -67,19 +74,28 @@
     <hr />
 
     <div class="existing-section">
-      <h2>Previously Processed PDFs</h2>
+      <h2>Your PDFs</h2>
       <ul id="processedList">
-        <li>Loading...</li>
+        <li class="loading">Loading...</li>
       </ul>
     </div>
 
     <script>
       async function uploadPDF() {
         const fileInput = document.getElementById("pdfInput");
+        const status = document.getElementById("uploadStatus");
+        const uploadInterface = document.getElementById("uploadInterface");
+
         const file = fileInput.files[0];
+
         if (!file) return alert("Please select a PDF file first.");
+
         const formData = new FormData();
         formData.append("pdf", file);
+
+        uploadInterface.style.display = "none";
+        status.textContent = `Processing ${file.name || ""}... Please wait.`;
+        status.className = "loading";
 
         const res = await fetch("/process", {
           method: "POST",
@@ -88,11 +104,26 @@
 
         if (!res.ok) {
           alert("Failed to process PDF.");
+          status.textContent = "❌ Error processing file.";
           return;
         }
 
         const data = await res.json();
+        fileInput.value = ""; // Clear file input
+        status.textContent = "✅ Successfully processed!";
+        setTimeout(() => (status.textContent = ""), 2000);
         window.location.href = `/reader.html/${data.name}`;
+      }
+
+      async function deletePDF(name) {
+        if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+
+        const res = await fetch(`/delete/${name}`, { method: "DELETE" });
+        if (res.ok) {
+          loadProcessed(); // Reload list
+        } else {
+          alert("Failed to delete file.");
+        }
       }
 
       async function loadProcessed() {
@@ -102,19 +133,27 @@
         list.innerHTML = "";
 
         if (files.length === 0) {
-          list.innerHTML = "<li>No files found.</li>";
+          list.innerHTML = "No PDFS found. Upload and process one";
           return;
         }
 
         files.forEach((file) => {
           const li = document.createElement("li");
-          const btn = document.createElement("button");
-          btn.textContent = "Open";
-          btn.onclick = () => {
+
+          const openBtn = document.createElement("button");
+          openBtn.textContent = "Open";
+          openBtn.onclick = () => {
             window.location.href = `/reader.html/${file}`;
           };
+
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Delete";
+          delBtn.style.backgroundColor = "#fdd";
+          delBtn.onclick = () => deletePDF(file);
+
           li.textContent = file + " ";
-          li.appendChild(btn);
+          li.appendChild(openBtn);
+          li.appendChild(delBtn);
           list.appendChild(li);
         });
       }
