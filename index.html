@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>PDF Audio Reader</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        max-width: 800px;
+        margin: auto;
+      }
+      .chunk {
+        padding: 8px;
+        margin-bottom: 4px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      .chunk:hover {
+        background-color: #f0f0f0;
+      }
+      .chunk.active {
+        background-color: #d0ebff;
+      }
+      .controls {
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="controls">
+      <button id="playPauseBtn">Play</button>
+    </div>
+    <audio id="audio" src="full.wav"></audio>
+
+    <div id="chunkList"></div>
+
+    <script>
+      const audio = document.getElementById("audio");
+      const playPauseBtn = document.getElementById("playPauseBtn");
+      const chunkList = document.getElementById("chunkList");
+      let chunks = [];
+      let currentChunkIndex = -1;
+      let isSeeking = false;
+
+      fetch("chunks.json")
+        .then((res) => res.json())
+        .then((data) => {
+          chunks = data;
+          renderChunks();
+        });
+
+      function renderChunks() {
+        chunks.forEach((chunk, i) => {
+          const div = document.createElement("div");
+          div.className = "chunk";
+          div.textContent = chunk.text;
+          div.onclick = () => {
+            isSeeking = true;
+            audio.currentTime = chunk.start;
+
+            if (audio.paused) {
+              audio.play();
+              playPauseBtn.textContent = "Pause";
+            }
+
+            highlightChunk(i);
+            isSeeking = false;
+          };
+          chunkList.appendChild(div);
+        });
+      }
+
+      playPauseBtn.onclick = () => {
+        if (audio.paused) {
+          audio.play();
+          playPauseBtn.textContent = "Pause";
+        } else {
+          audio.pause();
+          playPauseBtn.textContent = "Play";
+        }
+      };
+
+      function highlightChunk(index) {
+        if (index === currentChunkIndex) return;
+        const nodes = document.querySelectorAll(".chunk");
+        nodes.forEach((node, i) => {
+          node.classList.toggle("active", i === index);
+        });
+        currentChunkIndex = index;
+      }
+
+      audio.addEventListener("timeupdate", () => {
+        if (isSeeking) return;
+
+        for (let i = 0; i < chunks.length; i++) {
+          const start = chunks[i].start;
+          const end =
+            i + 1 < chunks.length ? chunks[i + 1].start : audio.duration;
+          if (audio.currentTime >= start && audio.currentTime < end) {
+            highlightChunk(i);
+            break;
+          }
+        }
+      });
+
+      audio.addEventListener("ended", () => {
+        playPauseBtn.textContent = "Play";
+        highlightChunk(-1);
+      });
+    </script>
+  </body>
+</html>
