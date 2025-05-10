@@ -4,16 +4,16 @@ __pycache__
 
 
 # espeak stuff
-main/share/
-main/bin/
-main/lib
+main/Resources/share/
+main/Resources/bin/
+main/Resources/lib
 
 # processed (local files)
-main/processed
+main/Resources/processed
 
 # Build (pyinstaller)
-main/build
-main/dist
+main/Resources/build
+main/Resources/dist
 
-# Bundle
-MeiLiTTs.app
+
+MeiLiTTs.app/

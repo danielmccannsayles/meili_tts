@@ -1,14 +1,16 @@
 import os
 import socket
 import subprocess
+import sys
+import tempfile
 import time
 import webbrowser
 from pathlib import Path
 
-APP_DIR = (
-    Path(__file__).resolve().parent.parent
-)  # Meili.app/Contents/MacOS → up to Contents
-RES_DIR = APP_DIR / "Resources"
+if hasattr(sys, "_MEIPASS"):
+    RES_DIR = Path(sys._MEIPASS) / "Resources"
+else:
+    RES_DIR = Path(__file__).resolve().parent / "Resources"
 
 # Set env vars for espeak-ng
 os.environ["PATH"] = str(RES_DIR / "bin") + ":" + os.environ.get("PATH", "")
@@ -16,13 +18,18 @@ os.environ["DYLD_LIBRARY_PATH"] = str(RES_DIR / "lib")
 os.environ["ESPEAK_DATA_PATH"] = str(RES_DIR / "share" / "espeak-ng-data")
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 
+
+log_path = Path(tempfile.gettempdir()) / "meili_server.log"
+print(f"Logging to: {log_path}")
+
 # Run server.py from Resources
+log_file = open("/tmp/meili_server.log", "w")
 server_script = RES_DIR / "server.py"
 server_proc = subprocess.Popen(
     ["python3", str(server_script)],
     cwd=RES_DIR,
-    stdout=subprocess.DEVNULL,
-    stderr=subprocess.DEVNULL,
+    stdout=log_file,
+    stderr=log_file,
 )
 
 
