@@ -1,1 +1,8 @@
+#
 .venv/
+
+
+# espeak stuff
+meili_tts/share/
+meili_tts/bin/
+meili_tts/lib

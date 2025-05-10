@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MeiLi TTS</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 40px auto;
+        max-width: 700px;
+        padding: 0 20px;
+        line-height: 1.6;
+      }
+
+      h1 {
+        margin-top: 0;
+        font-size: 2em;
+      }
+
+      .upload-section,
+      .existing-section {
+        margin-bottom: 40px;
+      }
+
+      button {
+        padding: 6px 14px;
+        font-size: 1em;
+        margin-left: 10px;
+        cursor: pointer;
+      }
+
+      li {
+        margin-bottom: 8px;
+      }
+
+      .chunk {
+        margin: 8px 0;
+        padding: 6px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .chunk.active {
+        background-color: #d0ebff;
+      }
+
+      hr {
+        margin: 30px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📖 Meilis PDF Audio Reader</h1>
+
+    <div class="upload-section">
+      <h2>Upload a PDF</h2>
+      <input type="file" id="pdfInput" accept=".pdf" />
+      <button onclick="uploadPDF()">Process</button>
+      <p>
+        <small
+          >Your file will be processed locally using TTS and made
+          interactive.</small
+        >
+      </p>
+    </div>
+
+    <hr />
+
+    <div class="existing-section">
+      <h2>Previously Processed PDFs</h2>
+      <ul id="processedList">
+        <li>Loading...</li>
+      </ul>
+    </div>
+
+    <script>
+      async function uploadPDF() {
+        const fileInput = document.getElementById("pdfInput");
+        const file = fileInput.files[0];
+        if (!file) return alert("Please select a PDF file first.");
+        const formData = new FormData();
+        formData.append("pdf", file);
+
+        const res = await fetch("/process", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          alert("Failed to process PDF.");
+          return;
+        }
+
+        const data = await res.json();
+        window.location.href = `/reader.html/${data.name}`;
+      }
+
+      async function loadProcessed() {
+        const res = await fetch("/list_processed");
+        const files = await res.json();
+        const list = document.getElementById("processedList");
+        list.innerHTML = "";
+
+        if (files.length === 0) {
+          list.innerHTML = "<li>No files found.</li>";
+          return;
+        }
+
+        files.forEach((file) => {
+          const li = document.createElement("li");
+          const btn = document.createElement("button");
+          btn.textContent = "Open";
+          btn.onclick = () => {
+            window.location.href = `/reader.html/${file}`;
+          };
+          li.textContent = file + " ";
+          li.appendChild(btn);
+          list.appendChild(li);
+        });
+      }
+
+      loadProcessed();
+    </script>
+  </body>
+</html>
