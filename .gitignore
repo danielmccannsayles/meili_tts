@@ -1,11 +1,16 @@
 #
 .venv/
+__pycache__
 
 
 # espeak stuff
-meili_tts/share/
-meili_tts/bin/
-meili_tts/lib
+meili_tts_app/share/
+meili_tts_app/bin/
+meili_tts_app/lib
 
 # processed (local files)
-meili_tts/processed
+meili_tts_app/processed
+
+# Build (pyinstaller)
+meili_tts_app/build
+meili_tts_app/dist

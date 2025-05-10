@@ -1,4 +1,3 @@
-import os
 import shutil
 from pathlib import Path
 
@@ -76,4 +75,4 @@ def list_processed():
 
 
 if __name__ == "__main__":
-    app.run(port=8000, debug=True)
+    app.run(port=8000, debug=False, use_reloader=False)  # Turned off for subprocess
