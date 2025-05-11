@@ -3,13 +3,27 @@
 Run this from main/
 
 ```bash
-pyinstaller --onefile \
-  --add-data "Resources:Resources" \
-  launch.py
+pyinstaller launch.spec
 ```
 
 Then copy the launch exec into .app/contents/MacOS
 And make sure Resources/ is at the same level
+
+### Old documentation
+
+To create the launch.spec I ran:
+
+```bash
+pyinstaller --onefile \
+  --add-data "Resources:Resources" \
+  --hidden-import=flask \
+  --hidden-import=fitz \
+  --hidden-import=numpy \
+  --hidden-import=soundfile \
+  --hidden-import=kokoro \
+  --hidden-import=rumps \
+  launch.py
+```
 
 ### How to run
 

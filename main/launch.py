@@ -1,3 +1,4 @@
+# launch.py
 import os
 import socket
 import subprocess
@@ -8,6 +9,9 @@ import webbrowser
 from pathlib import Path
 
 import rumps
+
+# Server mode
+IS_SERVER = "--server" in sys.argv
 
 if hasattr(sys, "_MEIPASS"):
     RES_DIR = Path(sys._MEIPASS) / "Resources"
@@ -26,10 +30,16 @@ print(f"Logging to: {log_path}")
 
 # Run server.py from Resources
 log_file = open("/tmp/meili_server.log", "w")
-server_script = RES_DIR / "server.py"
+if IS_SERVER:
+    # We're in server mode — run the Flask app directly
+    from server import app
+
+    app.run(port=8000, debug=False, use_reloader=False)
+    sys.exit(0)
+
+# Otherwise, start the server by launching this script again in --server mode
 server_proc = subprocess.Popen(
-    ["python3", str(server_script)],
-    cwd=RES_DIR,
+    [sys.executable, "--server"],
     stdout=log_file,
     stderr=log_file,
 )
@@ -42,7 +52,8 @@ def is_port_open(host, port):
         return sock.connect_ex((host, port)) == 0
 
 
-for _ in range(40):
+# Wait 20 seconds to open window... often times takes a long time :/
+for _ in range(100):
     if is_port_open("127.0.0.1", 8000):
         break
     time.sleep(0.2)

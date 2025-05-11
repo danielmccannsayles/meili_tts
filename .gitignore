@@ -14,4 +14,7 @@ main/Resources/processed
 # Build (pyinstaller)
 main/build
 main/dist
+
+# Launch binary
 MeiLiTTs.app/Contents/MacOS/launch
+
