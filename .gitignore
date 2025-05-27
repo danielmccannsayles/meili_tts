@@ -15,6 +15,12 @@ main/Resources/processed
 main/build
 main/dist
 
-# Launch binary
-MeiLiTTs.app/Contents/MacOS/launch
+# Binaries / heavy stuff
+MeiLiTTs.app/Contents/MacOS/
+MeiLiTTs.dmg
 
+# Using pyinstaller to create the app now!
+MeiliTTs.app/
+
+# 40 mb lol
+MeiliTTs.dmg

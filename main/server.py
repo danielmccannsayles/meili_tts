@@ -16,6 +16,13 @@ if hasattr(sys, "_MEIPASS"):
 else:
     VIEWER_DIR = Path(__file__).resolve().parent / "Resources" / "viewer"
 
+print(f"VIEWER_DIR: {VIEWER_DIR}")
+print(f"VIEWER_DIR exists: {VIEWER_DIR.exists()}")
+if VIEWER_DIR.exists():
+    print(f"Files in VIEWER_DIR: {list(VIEWER_DIR.iterdir())}")
+else:
+    print("VIEWER_DIR does not exist!")
+
 app = Flask(__name__, static_folder=str(VIEWER_DIR))
 app.config["UPLOAD_FOLDER"] = UPLOAD_DIR
 

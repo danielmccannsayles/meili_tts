@@ -1,6 +1,4 @@
 # -*- mode: python ; coding: utf-8 -*-
-
-
 import os
 import glob
 from PyInstaller.utils.hooks import collect_data_files
@@ -17,7 +15,6 @@ def find_data(package, relative_path=""):
         return []
     return [(os.path.join(full_path, f), os.path.join(package, relative_path)) 
         for f in os.listdir(full_path) if not f.endswith('.py')]
-
 
 # Manually include .json files for language_tags, etc.
 extra_datas = []
@@ -50,25 +47,51 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
+
 pyz = PYZ(a.pure)
 
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [],
+    exclude_binaries=True,
     name='launch',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
-    console=True,
+    console=False,  # Changed to False to hide terminal window
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='launch',
+)
+
+app = BUNDLE(
+    coll,
+    name='MeiliTTs.app',
+    icon=None,
+    bundle_identifier='meilitts', 
+    info_plist={
+        'NSHighResolutionCapable': True,
+        'CFBundleURLTypes': [
+            {
+                'CFBundleURLName': 'meilitts',
+                'CFBundleURLSchemes': ['meilitts']
+            }
+        ],
+        'LSBackgroundOnly': False,
+    },
 )

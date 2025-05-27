@@ -55,13 +55,13 @@
     </style>
   </head>
   <body>
-    <h1>📖 Meili's PDF Audio Reader</h1>
+    <h1>📖 poo</h1>
 
     <div class="upload-section">
       <h2>Upload a PDF</h2>
       <div id="uploadInterface">
         <input type="file" id="pdfInput" accept=".pdf" />
-        <button onclick="uploadPDF()">Process</button>
+        <button type="buton" onclick="uploadPDF()">Process</button>
       </div>
       <p id="uploadStatus">
         <small
@@ -97,22 +97,34 @@
         status.textContent = `Processing ${file.name || ""}... Please wait.`;
         status.className = "loading";
 
-        const res = await fetch("/process", {
-          method: "POST",
-          body: formData,
-        });
+        try {
+          const res = await fetch("/process", {
+            method: "POST",
+            body: formData,
+            // Important for preventing navigation
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+            },
+          });
 
-        if (!res.ok) {
-          alert("Failed to process PDF.");
+          if (!res.ok) {
+            throw new Error("Failed to process PDF");
+          }
+
+          const data = await res.json();
+          fileInput.value = ""; // Clear file input
+          status.textContent = "✅ Successfully processed!";
+          status.className = "";
+          uploadInterface.style.display = "block";
+          setTimeout(() => {
+            window.location.href = `/reader.html/${data.name}`;
+          }, 1000);
+        } catch (err) {
+          console.error(err);
           status.textContent = "❌ Error processing file.";
-          return;
+          status.className = "";
+          uploadInterface.style.display = "block";
         }
-
-        const data = await res.json();
-        fileInput.value = ""; // Clear file input
-        status.textContent = "✅ Successfully processed!";
-        setTimeout(() => (status.textContent = ""), 2000);
-        window.location.href = `/reader.html/${data.name}`;
       }
 
       async function deletePDF(name) {
