@@ -1,3 +1,7 @@
+### New minimal version!
+
+**see meili_tts_simple/README.md**
+
 ### Actual App now
 
 Run this from main/

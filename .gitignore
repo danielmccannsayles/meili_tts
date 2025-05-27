@@ -3,24 +3,22 @@
 __pycache__
 
 
+# Simple app
+meili_tts_simple/bin
+
+# Shipping a whole python lib lol. cp'd from my python
+meili_tts_simple/python
+
+
 # espeak stuff
-main/Resources/share/
-main/Resources/bin/
-main/Resources/lib
+old/Resources/share/
+old/Resources/bin/
+old/Resources/lib
 
 # processed (local files)
-main/Resources/processed
+old/Resources/processed
 
 # Build (pyinstaller)
-main/build
-main/dist
+old/build
+old/dist
 
-# Binaries / heavy stuff
-MeiLiTTs.app/Contents/MacOS/
-MeiLiTTs.dmg
-
-# Using pyinstaller to create the app now!
-MeiliTTs.app/
-
-# 40 mb lol
-MeiliTTs.dmg
