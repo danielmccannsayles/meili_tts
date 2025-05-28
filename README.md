@@ -16,18 +16,13 @@ Link to download: https://drive.google.com/file/d/1_1m24ZZNijrc7OirrHCSYxWHbqeLX
 
 ### Information!
 
-bin/ has espeak-ng stuff in it
+1. bin/ has espeak-ng stuff in it. This should just work.
 
-python/ folder created with cp -R <pyenv which python3> python/
+2. python/ folder created with cp -R `pyenv which python3` python/. This is too big to be uploaded to github so it will be left as an excercise to the reader
 
-Run `./make_release.sh` to make a release. It will clean up the python/ folder, and then zip up the meili_tts_simple folder (you may need to run chmod +x first)
+3. Run `./make_release.sh` to make a release. It will clean up the python/ folder, then zip up the meili_tts_simple folder (you may need to run chmod +x first)
 
-## Requirements
-
-- pip install reqirements.txt
-- Uses [Kokoro](https://github.com/hexgrad/kokoro?tab=readme-ov-file), so need espeak-ng package
-
-_Note: Only works on mac rn (I assume)_
+4. Uses [Kokoro](https://github.com/hexgrad/kokoro?tab=readme-ov-file), this is why need espeak-ng package
 
 ### TODO:
 
