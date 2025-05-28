@@ -1,3 +1,5 @@
+** Still in progress..**
+
 ## MeiLiTTs App.
 
 A lightweight (250mb :laughing:) open source TTS reader!
@@ -11,8 +13,6 @@ Main view:
 
 Reader View:
 ![simple paragraph chunked view w/ a play button & slider](readme_assets/reader-view.png)
-
-Link to download: https://drive.google.com/file/d/1_1m24ZZNijrc7OirrHCSYxWHbqeLXP1g/view
 
 ### Information!
 
