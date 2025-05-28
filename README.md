@@ -1,3 +1,9 @@
+## TODO:
+
+1. Get rid of old version
+2. Get rid of external requirements.txt? and venv? Only really need this inside? or maybe keep it for dev idk.
+3. Streamline the python/ creation & some stuff in that vein.
+
 ### New minimal version!
 
 bin/ has espeak-ng stuff in it

@@ -2,13 +2,14 @@
 .venv/
 __pycache__
 
-# zipped 
-MeiliTTs.zip
 
 # Shipping a whole python lib lol. cp'd from my python
-meili_tts_simple/python
+MeiLiTTs/python
 
+# Zipped 
+MeiLiTTs.zip
 
+## OLD stuff: todo: delete
 # espeak stuff
 old/Resources/share/
 old/Resources/bin/

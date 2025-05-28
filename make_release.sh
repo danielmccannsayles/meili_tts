@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-APP_NAME="meili_tts_simple"
+APP_NAME="MeiLiTTs"
 APP_DIR="./$APP_NAME"
 PYTHON_DIR="$APP_DIR/python"
 VENV_DIR="$APP_DIR/.venv"
-ZIP_NAME="MeiliTTs.zip"
+ZIP_NAME="MeiLiTTs.zip"
 
 # Print size helper
 print_size() {
