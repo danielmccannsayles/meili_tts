@@ -2,7 +2,8 @@
 .venv/
 __pycache__
 
-
+# zipped 
+MeiliTTs.zip
 
 # Shipping a whole python lib lol. cp'd from my python
 meili_tts_simple/python
