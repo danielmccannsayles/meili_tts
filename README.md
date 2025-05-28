@@ -22,7 +22,9 @@ Link to download: https://drive.google.com/file/d/1_1m24ZZNijrc7OirrHCSYxWHbqeLX
 
 3. Run `./make_release.sh` to make a release. It will clean up the python/ folder, then zip up the meili_tts_simple folder (you may need to run chmod +x first)
 
-4. Uses [Kokoro](https://github.com/hexgrad/kokoro?tab=readme-ov-file), this is why need espeak-ng package
+4. Run `./rebuild_python.sh` to rebuild the python lib in MeiLiTTs w/ your python3 from your computer. Note that you should have pyenv for this to work - you may have to rewrite this script- I put ~5s of asking ChatGPT into it.
+
+5. Uses [Kokoro](https://github.com/hexgrad/kokoro?tab=readme-ov-file), this is why need espeak-ng package
 
 ### TODO:
 
