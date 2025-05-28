@@ -10,7 +10,7 @@ Main view:
 ![minimalistic menu showing ability to process PDFs, open existing ones](readme_assets/main-view.png)
 
 Reader View:
-![simple paragraph chunked view w/ a play button & slider](readme_assets/main-view.png)
+![simple paragraph chunked view w/ a play button & slider](readme_assets/reader-view.png)
 
 Link to download: https://drive.google.com/file/d/1_1m24ZZNijrc7OirrHCSYxWHbqeLXP1g/view
 
