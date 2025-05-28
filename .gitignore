@@ -3,8 +3,6 @@
 __pycache__
 
 
-# Simple app
-meili_tts_simple/bin
 
 # Shipping a whole python lib lol. cp'd from my python
 meili_tts_simple/python
