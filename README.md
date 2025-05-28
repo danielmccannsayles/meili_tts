@@ -1,6 +1,8 @@
 ### New minimal version!
 
-**see meili_tts_simple/README.md**
+bin/ has espeak-ng stuff in it
+
+python/ folder created with cp -R <pyenv which python3> python/
 
 ### Actual App now
 

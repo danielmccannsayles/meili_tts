@@ -1,8 +1,5 @@
-Switching to a new paradigm.
+Double click launch.command to run!
 
-python/ folder created with cp -R <pyenv which python3> python/
+It will open a terminal window; don't be alarmed.
 
-.venv/ created w/
-python/bin/python3 -m venv .venv
-
-Note that launch.sh remake the .venv/pyvenv.cfg. This is important
+The first time running this (or if the folder is moved) will take a minute or two to setup
