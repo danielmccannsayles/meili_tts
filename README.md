@@ -20,7 +20,7 @@ Reader View:
 2. Open the folder. Double click launch.command
 3. This will open a terminal window. Wait a bit
 4. During the first time using this app or after the folder is moved, the environment will be rebuilt. This will take a couple of minutes
-5. Enjoy!
+5. It will open a mac icon thing in the top right, and should open the website on your default browser
 6. Keep the terminal window open. Here you can see progress
 
 ### Information!
@@ -31,7 +31,7 @@ Reader View:
 
 3. Run `./make_release.sh` to make a release. It will clean up the python/ folder, then zip up the meili_tts_simple folder (you may need to run chmod +x first). This will fail if you don't have python3.12. Feel free to rewrite this using a LLM. This is what I did.
 
-4. Uses [Kokoro](https://github.com/hexgrad/kokoro?tab=readme-ov-file), this is why need espeak-ng package
+4. Uses [Kokoro](https://github.com/hexgrad/kokoro?tab=readme-ov-file), this is why we need espeak-ng package
 
 ### TODO:
 

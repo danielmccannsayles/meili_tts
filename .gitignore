@@ -3,6 +3,9 @@
 __pycache__
 
 
+# Local testing
+MeiLiTTs/processed
+
 # Shipping a whole python lib lol. cp'd from my python
 MeiLiTTs/python
 

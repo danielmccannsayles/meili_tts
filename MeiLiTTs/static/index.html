@@ -52,6 +52,86 @@
         color: #888;
         font-style: italic;
       }
+
+      .drop-zone {
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 40px 20px;
+        text-align: center;
+        background-color: #fafafa;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-bottom: 20px;
+      }
+
+      .drop-zone.dragover {
+        border-color: #007bff;
+        background-color: #e7f3ff;
+      }
+
+      .drop-zone p {
+        margin: 10px 0;
+        color: #666;
+      }
+
+      .cancel-btn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        margin-left: 10px;
+      }
+
+      .cancel-btn:hover {
+        background-color: #c82333;
+      }
+
+      .processing-item {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        background-color: #f8f9fa;
+      }
+
+      .processing-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .processing-title {
+        font-weight: bold;
+        margin: 0;
+      }
+
+      .processing-status {
+        font-size: 0.9em;
+        color: #666;
+        margin: 5px 0;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 20px;
+        background-color: #e9ecef;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 10px 0;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background-color: #007bff;
+        transition: width 0.3s ease;
+        border-radius: 10px;
+      }
+
+      .progress-text {
+        text-align: center;
+        font-size: 0.8em;
+        margin-top: 5px;
+      }
     </style>
   </head>
   <body>
@@ -60,15 +140,40 @@
     <div class="upload-section">
       <h2>Upload a PDF</h2>
       <div id="uploadInterface">
-        <input type="file" id="pdfInput" accept=".pdf" />
-        <button type="buton" onclick="uploadPDF()">Process</button>
+        <div
+          class="drop-zone"
+          id="dropZone"
+          onclick="document.getElementById('pdfInput').click()"
+        >
+          <p>📄 <strong>Drop your PDF here</strong></p>
+          <p>or click to browse files</p>
+          <input
+            type="file"
+            id="pdfInput"
+            accept=".pdf"
+            style="display: none"
+          />
+        </div>
+        <div style="text-align: center">
+          <button type="button" onclick="uploadPDF()">Process</button>
+        </div>
       </div>
       <p id="uploadStatus">
         <small
-          >Your file will be processed locally using TTS and made
-          interactive.</small
+          >Your file will be processed locally using TTS and made interactive.
+          Multiple files can be processed simultaneously.</small
         >
       </p>
+    </div>
+
+    <div
+      class="processing-section"
+      id="processingSection"
+      style="display: none"
+    >
+      <hr />
+      <h2>Currently Processing</h2>
+      <div id="processingList"></div>
     </div>
 
     <hr />
@@ -81,49 +186,238 @@
     </div>
 
     <script>
+      // Track processing jobs
+      let processingJobs = new Map();
+      let statusPollingInterval = null;
+      let dropZone, fileInput;
+
+      // Wait for DOM to be ready
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get DOM elements
+        dropZone = document.getElementById("dropZone");
+        fileInput = document.getElementById("pdfInput");
+
+        if (!dropZone || !fileInput) {
+          console.error("Required DOM elements not found");
+          return;
+        }
+
+        // Initialize drag & drop functionality
+        initializeDragAndDrop();
+
+        // Load existing data
+        loadProcessed();
+        // Don't load existing jobs - jobs are session-based only
+      });
+
+      function initializeDragAndDrop() {
+        dropZone.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          dropZone.classList.add("dragover");
+        });
+
+        dropZone.addEventListener("dragleave", (e) => {
+          e.preventDefault();
+          dropZone.classList.remove("dragover");
+        });
+
+        dropZone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          dropZone.classList.remove("dragover");
+
+          const files = e.dataTransfer.files;
+          if (files.length > 0 && files[0].type === "application/pdf") {
+            fileInput.files = files;
+            updateDropZoneText(files[0].name);
+          } else {
+            alert("Please drop a valid PDF file.");
+          }
+        });
+
+        fileInput.addEventListener("change", (e) => {
+          if (e.target.files.length > 0) {
+            updateDropZoneText(e.target.files[0].name);
+          }
+        });
+      }
+
+      function updateDropZoneText(filename) {
+        dropZone.innerHTML = `
+          <p>📄 <strong>${filename}</strong></p>
+          <p>Click to choose a different file</p>
+        `;
+      }
+
+      async function cancelJob(jobId) {
+        try {
+          const res = await fetch(`/cancel_job/${jobId}`, { method: "POST" });
+          if (res.ok) {
+            console.log(`Job ${jobId} cancelled`);
+          }
+        } catch (err) {
+          console.error("Failed to cancel job:", err);
+        }
+      }
+
+      function createProcessingItem(job) {
+        const item = document.createElement("div");
+        item.className = "processing-item";
+        item.id = `job-${job.job_id || "unknown"}`;
+
+        const statusText = getStatusText(job.status);
+        const progressPercent = job.progress || 0;
+
+        item.innerHTML = `
+          <div class="processing-header">
+            <h3 class="processing-title">${job.name} (${job.filename})</h3>
+            <button class="cancel-btn" onclick="cancelJob('${
+              job.job_id || ""
+            }')">Cancel</button>
+          </div>
+          <div class="processing-status">${statusText}</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${progressPercent}%"></div>
+          </div>
+          <div class="progress-text">${progressPercent}%</div>
+        `;
+
+        return item;
+      }
+
+      function getStatusText(status) {
+        switch (status) {
+          case "starting":
+            return "Starting...";
+          case "processing":
+            return "Extracting text...";
+          case "generating_audio":
+            return "Generating audio...";
+          case "writing_files":
+            return "Writing files...";
+          case "completed":
+            return "Completed!";
+          case "cancelled":
+            return "Cancelled";
+          case "error":
+            return "Error occurred";
+          default:
+            return "Processing...";
+        }
+      }
+
+      function updateProcessingDisplay() {
+        const section = document.getElementById("processingSection");
+        const list = document.getElementById("processingList");
+
+        if (processingJobs.size === 0) {
+          section.style.display = "none";
+          return;
+        }
+
+        section.style.display = "block";
+        list.innerHTML = "";
+
+        for (const [jobId, job] of processingJobs) {
+          const item = createProcessingItem({ ...job, job_id: jobId });
+          list.appendChild(item);
+        }
+      }
+
+      async function pollJobStatuses() {
+        // Don't poll if we're on reader view
+        if (window.location.pathname.includes('/reader.html/')) {
+          return;
+        }
+
+        const jobIds = Array.from(processingJobs.keys());
+
+        for (const jobId of jobIds) {
+          try {
+            const res = await fetch(`/job_status/${jobId}`);
+            if (res.ok) {
+              const jobStatus = await res.json();
+              processingJobs.set(jobId, jobStatus);
+
+              // Remove completed/cancelled/error jobs immediately
+              if (
+                ["completed", "cancelled", "error"].includes(jobStatus.status)
+              ) {
+                processingJobs.delete(jobId);
+                
+                // Refresh processed PDFs list when a job completes
+                if (jobStatus.status === "completed") {
+                  loadProcessed();
+                }
+              }
+            } else {
+              // Job not found, remove it
+              processingJobs.delete(jobId);
+            }
+          } catch (err) {
+            console.error(`Failed to poll job ${jobId}:`, err);
+          }
+        }
+
+        updateProcessingDisplay();
+
+        // Stop polling if no active jobs
+        if (processingJobs.size === 0 && statusPollingInterval) {
+          clearInterval(statusPollingInterval);
+          statusPollingInterval = null;
+        }
+      }
+
       async function uploadPDF() {
-        const fileInput = document.getElementById("pdfInput");
-        const status = document.getElementById("uploadStatus");
-        const uploadInterface = document.getElementById("uploadInterface");
+        if (!fileInput) {
+          alert("File input not ready. Please try again.");
+          return;
+        }
 
         const file = fileInput.files[0];
-
         if (!file) return alert("Please select a PDF file first.");
 
         const formData = new FormData();
         formData.append("pdf", file);
 
-        uploadInterface.style.display = "none";
-        status.textContent = `Processing ${file.name || ""}... Please wait.`;
-        status.className = "loading";
-
         try {
           const res = await fetch("/process", {
             method: "POST",
             body: formData,
-            // Important for preventing navigation
             headers: {
               "X-Requested-With": "XMLHttpRequest",
             },
           });
 
           if (!res.ok) {
-            throw new Error("Failed to process PDF");
+            throw new Error("Failed to start processing");
           }
 
           const data = await res.json();
-          fileInput.value = ""; // Clear file input
-          status.textContent = "✅ Successfully processed!";
-          status.className = "";
-          uploadInterface.style.display = "block";
-          setTimeout(() => {
-            window.location.href = `/reader.html/${data.name}`;
-          }, 1000);
+
+          // Add job to tracking
+          processingJobs.set(data.job_id, {
+            name: data.name,
+            filename: file.name,
+            status: "starting",
+            progress: 0,
+          });
+
+          // Clear file input and reset drop zone
+          fileInput.value = "";
+          dropZone.innerHTML = `
+            <p>📄 <strong>Drop your PDF here</strong></p>
+            <p>or click to browse files</p>
+          `;
+
+          // Start polling if not already running
+          if (!statusPollingInterval) {
+            statusPollingInterval = setInterval(pollJobStatuses, 2000);
+          }
+
+          updateProcessingDisplay();
         } catch (err) {
           console.error(err);
-          status.textContent = "❌ Error processing file.";
-          status.className = "";
-          uploadInterface.style.display = "block";
+          alert("Failed to start processing: " + err.message);
         }
       }
 
@@ -170,7 +464,26 @@
         });
       }
 
-      loadProcessed();
+      // Load existing jobs and processed files on page load
+      async function loadExistingJobs() {
+        try {
+          const res = await fetch("/list_jobs");
+          if (res.ok) {
+            const jobs = await res.json();
+            for (const job of jobs) {
+              processingJobs.set(job.job_id, job);
+            }
+            if (processingJobs.size > 0) {
+              updateProcessingDisplay();
+              if (!statusPollingInterval) {
+                statusPollingInterval = setInterval(pollJobStatuses, 1000);
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Failed to load existing jobs:", err);
+        }
+      }
     </script>
   </body>
 </html>
