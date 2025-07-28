@@ -26,6 +26,10 @@ PROCESSED_DIR="$APP_DIR/processed"
 echo "🗑️ Removing processed files: $PROCESSED_DIR"
 rm -rf "$PROCESSED_DIR"
 
+# 🧹 Remove Python cache files
+echo "🗑️ Removing Python cache files"
+rm -rf "$APP_DIR"/__pycache__
+
 # Size after cleanup
 app_size_after=$(print_size "$APP_DIR")
 echo "📉 App size after cleanup:  $app_size_after"

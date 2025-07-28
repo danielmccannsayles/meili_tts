@@ -432,6 +432,16 @@
         }
       }
 
+      async function deleteIncompleteFile(name) {
+        // No confirmation for incomplete files - they're broken anyway
+        const res = await fetch(`/delete/${name}`, { method: "DELETE" });
+        if (res.ok) {
+          loadProcessed(); // Reload list
+        } else {
+          alert("Failed to delete incomplete file.");
+        }
+      }
+
       async function loadProcessed() {
         const res = await fetch("/list_processed");
         const files = await res.json();
@@ -443,23 +453,43 @@
           return;
         }
 
-        files.forEach((file) => {
+        files.forEach((item) => {
           const li = document.createElement("li");
 
-          const openBtn = document.createElement("button");
-          openBtn.textContent = "Open";
-          openBtn.onclick = () => {
-            window.location.href = `/reader.html/${file}`;
-          };
+          if (item.complete) {
+            // Complete file - show both Open and Delete buttons
+            const openBtn = document.createElement("button");
+            openBtn.textContent = "Open";
+            openBtn.onclick = () => {
+              window.location.href = `/reader.html/${item.name}`;
+            };
 
-          const delBtn = document.createElement("button");
-          delBtn.textContent = "Delete";
-          delBtn.style.backgroundColor = "#fdd";
-          delBtn.onclick = () => deletePDF(file);
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "Delete";
+            delBtn.style.backgroundColor = "#fdd";
+            delBtn.onclick = () => deletePDF(item.name);
 
-          li.textContent = file + " ";
-          li.appendChild(openBtn);
-          li.appendChild(delBtn);
+            li.textContent = item.name + " ";
+            li.appendChild(openBtn);
+            li.appendChild(delBtn);
+          } else {
+            // Incomplete file - show warning and only Delete button
+            const warningSpan = document.createElement("span");
+            warningSpan.textContent = " ⚠️ (incomplete - processing was interrupted)";
+            warningSpan.style.color = "#dc3545";
+            warningSpan.style.fontSize = "0.9em";
+
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "Delete";
+            delBtn.style.backgroundColor = "#dc3545";
+            delBtn.style.color = "white";
+            delBtn.onclick = () => deleteIncompleteFile(item.name);
+
+            li.textContent = item.name;
+            li.appendChild(warningSpan);
+            li.appendChild(delBtn);
+          }
+
           list.appendChild(li);
         });
       }

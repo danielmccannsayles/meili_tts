@@ -170,17 +170,28 @@ def list_jobs():
         return jsonify(jobs_with_ids)
 
 
+def is_processing_complete(folder_path):
+    """Check if a processed folder has all required files"""
+    required_files = ["chunks.json", "full.wav", "original.pdf"]
+    return all(os.path.exists(os.path.join(folder_path, file)) for file in required_files)
+
+
 @app.route("/list_processed")
 def list_processed():
     if not os.path.exists(OUTPUT_DIR):
         return jsonify([])
-    return jsonify(
-        [
-            name
-            for name in os.listdir(OUTPUT_DIR)
-            if os.path.isdir(os.path.join(OUTPUT_DIR, name))
-        ]
-    )
+    
+    processed_items = []
+    for name in os.listdir(OUTPUT_DIR):
+        folder_path = os.path.join(OUTPUT_DIR, name)
+        if os.path.isdir(folder_path):
+            is_complete = is_processing_complete(folder_path)
+            processed_items.append({
+                "name": name,
+                "complete": is_complete
+            })
+    
+    return jsonify(processed_items)
 
 
 @app.route("/delete/<name>", methods=["DELETE"])

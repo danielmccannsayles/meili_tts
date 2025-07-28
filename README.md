@@ -1,29 +1,39 @@
-** Still in progress..**
+Download here: https://drive.google.com/file/d/16okbqCzPgAn27-o-dqy9rdyh61RNfHDt/view?usp=sharing
+
+Or make your own :).
+
+_Needs system Python > 3.8, presumably M chip Mac (only tested on this)_
 
 ## MeiLiTTs App.
 
-A lightweight (250mb :laughing:) open source TTS reader!
+A lightweight (25mb) open source TTS reader!
 
-Upload your PDFs, watch them process locally, then follow along with them!
+Upload your PDFs, watch them process **locally**, then follow along with them!
 
 _only works on mac - potentially only on m3 - haven't checked anything else :p_
 
 Main view:
 ![minimalistic menu showing ability to process PDFs, open existing ones](readme_assets/main-view.png)
 
+Multi-processing:
+![Simple UI showing two reader files being processed once](readme_assets/processing.png)
+
 Reader View:
 ![simple paragraph chunked view w/ a play button & slider](readme_assets/reader-view.png)
 
 ### Instructions
 
-1. Download the zip. Unzip it
-2. Open the folder. Double click launch.command
-3. This will open a terminal window. Wait a bit
-4. During the first time using this app or after the folder is moved, the environment will be rebuilt. This will take a couple of minutes
-5. It will open a mac icon thing in the top right, and should open the website on your default browser
-6. Keep the terminal window open. Here you can see progress
+1. Download the zip. Unzip it.
+2. Put folder on desktop. Open the folder. Double click launch.command.
+3. This will open a terminal window. Don't be alarmed.
+4. If you've never ran this before it may download a new Python. This will take time. Errors may happen.
+5. The first time uing this app or after moving the folder, the environment will be rebuilt. This may take a couple of minutes.
+6. When ready, an icon thing will open in the top right of your screen (near the date/time), and the website should open
+7. Keep the terminal window open while running.
+8. Use the icon to quit the app when you're done
+9. Processed files will be saved locally. You can see them in the processed/ folder. Feel free to open this up and copy files out, but try not to change anything as it may break.
 
-### Information!
+### Dev Information
 
 1. bin/ has espeak-ng stuff in it. This should just work.
 
