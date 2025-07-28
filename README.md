@@ -27,11 +27,9 @@ Reader View:
 
 1. bin/ has espeak-ng stuff in it. This should just work.
 
-2. Run `./rebuild_python.sh` to rebuild/create the python lib in MeiLiTTs w/ the python3 from your computer. Note that you need pyenv for this to work. you may have to rewrite this script- I put ~30s of asking ChatGPT into it.
+2. Run `./make_release.sh` to make a release. It will clean up the python/ folder, then zip up the meili_tts_simple folder (you may need to run chmod +x first). This will fail if you don't have python3.12. Feel free to rewrite this using a LLM. This is what I did.
 
-3. Run `./make_release.sh` to make a release. It will clean up the python/ folder, then zip up the meili_tts_simple folder (you may need to run chmod +x first). This will fail if you don't have python3.12. Feel free to rewrite this using a LLM. This is what I did.
-
-4. Uses [Kokoro](https://github.com/hexgrad/kokoro?tab=readme-ov-file), this is why we need espeak-ng package
+3. Uses [Kokoro](https://github.com/hexgrad/kokoro?tab=readme-ov-file), this is why we need espeak-ng package
 
 ### TODO:
 

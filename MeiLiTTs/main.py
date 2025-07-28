@@ -9,7 +9,7 @@ import webbrowser
 
 import rumps
 from flask import Flask, jsonify, request, send_from_directory
-from process import process_pdf
+from process import process_pdf_cancellable
 
 # --- Environment setup for espeak-ng ---
 base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -62,9 +62,6 @@ def process_pdf_with_tracking(file_path, output_dir, job_id, original_name):
         with job_lock:
             active_jobs[job_id]["status"] = "processing"
             active_jobs[job_id]["progress"] = 0
-
-        # Import here to access the modified version
-        from process import process_pdf_cancellable
 
         process_pdf_cancellable(file_path, output_dir, job_id, active_jobs, job_lock)
 
@@ -125,13 +122,13 @@ def process():
             "start_time": time.time(),
         }
 
-    # Save file
-    save_path = os.path.join(OUTPUT_DIR, unique_name + ".pdf")
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    # Create output directory and save PDF as original.pdf
+    output_dir = os.path.join(OUTPUT_DIR, unique_name)
+    os.makedirs(output_dir, exist_ok=True)
+    save_path = os.path.join(output_dir, "original.pdf")
     file.save(save_path)
 
     # Start processing in background thread
-    output_dir = os.path.join(OUTPUT_DIR, unique_name)
     thread = threading.Thread(
         target=process_pdf_with_tracking,
         args=(save_path, output_dir, job_id, unique_name),
@@ -208,7 +205,7 @@ def start():
 # --- Rumps tray app ---
 class TrayApp(rumps.App):
     def __init__(self):
-        super().__init__("MeiLiTTS")
+        super().__init__("MeiLiTTs")
         self.menu = ["Open App"]
         start()
 
