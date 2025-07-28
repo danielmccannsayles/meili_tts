@@ -1,11 +1,17 @@
 # process.py
 import json
 import os
+import warnings
 from pathlib import Path
 
 import fitz  # PyMuPDF
 import numpy as np
 import soundfile as sf
+
+# Suppress known warnings from dependencies
+warnings.filterwarnings("ignore", category=UserWarning, module="torch.nn.modules.rnn")
+warnings.filterwarnings("ignore", category=FutureWarning, module="torch.nn.utils.weight_norm")
+
 from kokoro import KPipeline
 
 # Enable CPU fallback for Kokoro (https://github.com/hexgrad/kokoro?tab=readme-ov-file)
@@ -51,7 +57,7 @@ def process_pdf_cancellable(file_path, output_dir, job_id, active_jobs, job_lock
     chunks = []
 
     # Setup Kokoro
-    pipeline = KPipeline(lang_code="a")
+    pipeline = KPipeline(lang_code="a", repo_id="hexgrad/Kokoro-82M")
     generator = pipeline(clean_text, voice="af_heart")
 
     with job_lock:
